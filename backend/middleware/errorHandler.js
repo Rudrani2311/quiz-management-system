@@ -1,0 +1,18 @@
+const requestLogger = (req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+};
+
+const notFound = (req, res, next) => {
+  res.status(404);
+  next(new Error(`Not found: ${req.originalUrl}`));
+};
+
+const errorHandler = (err, req, res, next) => {
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode).json({
+    message: err.message || 'Server error'
+  });
+};
+
+module.exports = { requestLogger, notFound, errorHandler };
