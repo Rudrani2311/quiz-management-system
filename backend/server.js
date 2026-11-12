@@ -5,14 +5,14 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+dotenv.config({ path: path.join(__dirname, '.env') });
+
 const authRoutes = require('./routes/authRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const questionRoutes = require('./routes/questionRoutes');
 const resultRoutes = require('./routes/resultRoutes');
 const { requestLogger, notFound, errorHandler } = require('./middleware/errorHandler');
 const seedInitialData = require('./seed');
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,7 +26,6 @@ app.use('/api/quizzes', quizRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/results', resultRoutes);
 
-// Serve built React frontend in production (Render deployment)
 const frontendDist = path.join(__dirname, '..', 'frontend', 'dist');
 if (fs.existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
@@ -42,8 +41,8 @@ app.use(errorHandler);
 const startServer = async () => {
   const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/qmes';
   try {
-    await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
-    console.log('Connected to MongoDB database');
+    await mongoose.connect(uri, { serverSelectionTimeoutMS: 8000 });
+    console.log('Connected to MongoDB Atlas database (qmes)');
   } catch (err) {
     console.log('Primary MongoDB URI unreachable, starting embedded MongoDB fallback...');
     const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -53,7 +52,7 @@ const startServer = async () => {
   }
 
   await seedInitialData();
-  app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, '0.0.0.0', () => console.log(`Server running on http://localhost:${PORT}`));
 };
 
 startServer();
